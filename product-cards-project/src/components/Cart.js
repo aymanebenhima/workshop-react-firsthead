@@ -18,6 +18,7 @@ const Cart = ({ product, alertProduct }) => {
       <img src={image} alt={name} style={{ maxWidth: '100%' }} />
       <h3>{name}</h3>
       <p>{price}</p>
+      <a class="btn btn-primary btn-sm " href="#" role="button">Add to cart</a>
     </div>
   );
 };
