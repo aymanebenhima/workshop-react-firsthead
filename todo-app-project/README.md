@@ -1,7 +1,3 @@
-Sure, here's a README for your project structured similarly to the example you provided:
-
----
-
 # Todo App Project in React
 
 ## Objectives:
