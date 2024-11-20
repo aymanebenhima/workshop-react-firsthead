@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import PetsList from './components/PetsList';
 import useFilter from './hooks/useFilter';
-import { Form } from 'react-bootstrap';
+import { Form, Row, Col } from 'react-bootstrap';
+import TestClock from './components/TestClock';
 
 const petsData = [
   {
@@ -43,8 +44,15 @@ export default function App() {
   };
 
   return (
-    <div className="container">
-      <h1>Page d'Adoption</h1>
+    <div className="container pt-4">
+      <Row>
+        <Col>
+          <h1>Page d'Adoption</h1>
+        </Col>
+        <Col>
+          <TestClock />
+        </Col>
+      </Row>
       <Form>
         <Form.Group controlId="filterRace">
           <Form.Label>Race</Form.Label>
