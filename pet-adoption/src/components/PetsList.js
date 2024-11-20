@@ -2,7 +2,7 @@ import React from 'react';
 import PetCard from './PetCard';
 import { Row, Col } from 'react-bootstrap';
 
-function PetsList({ pets, onAdopt }) {
+export default function PetsList({ pets, onAdopt }) {
   return (
     <Row>
       {pets.map((pet) => (
@@ -13,5 +13,3 @@ function PetsList({ pets, onAdopt }) {
     </Row>
   );
 }
-
-export default PetsList;

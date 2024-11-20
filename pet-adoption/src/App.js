@@ -1,7 +1,7 @@
-import { useState } from 'react'
+import React, { useState } from 'react';
 import PetsList from './components/PetsList';
-import useFilter from './hooks/useFilter'
-import { Form } from 'react-bootstrap'
+import useFilter from './hooks/useFilter';
+import { Form } from 'react-bootstrap';
 
 const petsData = [
   {
@@ -28,53 +28,53 @@ const petsData = [
     photo: 'https://via.placeholder.com/150',
     status: 'Available',
   },
-]
+];
 
-function App() {
-  const [pets, setPets] = useState(petsData)
-  const { filterdPets, updateFilter, filters } = useFilter(pets)
+export default function App() {
+  const [pets, setPets] = useState(petsData);
+  const { filteredPets, updateFilter, filters } = useFilter(pets);
 
-  const adpotPet = (petToAdopt) => {
+  const adoptPet = (petToAdopt) => {
     setPets(
-      pets.map((pet) => pet.name === petToAdpot.name ? { ...pet, status: 'Adpoted' } : pet)
-    )
-  }
+      pets.map((pet) =>
+        pet.name === petToAdopt.name ? { ...pet, status: 'Adopted' } : pet
+      )
+    );
+  };
 
   return (
-    <div className='container'>
-      <h1>Animal Adpotion React Web App</h1>
+    <div className="container">
+      <h1>Page d'Adoption</h1>
       <Form>
-        <Form.Group controlId='filterRace'>
+        <Form.Group controlId="filterRace">
           <Form.Label>Race</Form.Label>
           <Form.Control
             type="text"
-            placeholder='Filter by race'
+            placeholder="Filtrer par race"
             value={filters.race}
             onChange={(e) => updateFilter('race', e.target.value)}
-            />
+          />
         </Form.Group>
-        <Form.Group controlId='filterType'>
+        <Form.Group controlId="filterType">
           <Form.Label>Type</Form.Label>
           <Form.Control
             type="text"
-            placeholder='Filter by type'
+            placeholder="Filtrer par type"
             value={filters.type}
             onChange={(e) => updateFilter('type', e.target.value)}
-            />
+          />
         </Form.Group>
-        <Form.Group controlId='filterLocation'>
+        <Form.Group controlId="filterLocation">
           <Form.Label>Location</Form.Label>
           <Form.Control
             type="text"
-            placeholder='Filter by Location'
+            placeholder="Filtrer par lieu"
             value={filters.location}
             onChange={(e) => updateFilter('location', e.target.value)}
-            />
+          />
         </Form.Group>
       </Form>
-      <PetsList pets={filterdPets} onAdpot={adpotPet} />
+      <PetsList pets={filteredPets} onAdopt={adoptPet} />
     </div>
   );
 }
-
-export default App;
