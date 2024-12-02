@@ -1,28 +1,26 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button, Form, Input, Modal, Rate } from 'antd';
+import { INITIAL_MOVIES } from '../data/constants';
 import Filter from '../components/Filter';
 import MovieList from '../components/MovieList';
 
 const Home = () => {
-  const [movies, setMovies] = useState([
-    {
-      title: 'Inception',
-      description: 'A mind-bending thriller by Christopher Nolan.',
-      posterURL: 'https://th.bing.com/th/id/OIP.rH59QGLqMltU2ieI3xJg7gHaK9?rs=1&pid=ImgDetMain',
-      rating: 5,
-    },
-    {
-      title: 'Interstellar',
-      description: 'A sci-fi epic that explores space and time.',
-      posterURL: 'https://th.bing.com/th/id/R.a9e6b040baac3da8d98356373c7b3920?rik=S%2bid%2bBcoFaGdmQ&riu=http%3a%2f%2fwww.dvdsreleasedates.com%2fcovers%2finterstellar-dvd-cover-71.jpg&ehk=Vk2TtmGhH5p9o17jAegt1DEUAiRqi09ynlz514VIv60%3d&risl=&pid=ImgRaw&r=0',
-      rating: 4,
-    },
-  ]);
 
+
+  const [movies, setMovies] = useState(INITIAL_MOVIES);
   const [titleFilter, setTitleFilter] = useState('');
   const [ratingFilter, setRatingFilter] = useState(0);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [newMovie, setNewMovie] = useState({ title: '', description: '', posterURL: '', rating: 0 });
+
+  useEffect(() => {
+    const storedMovies = JSON.parse(localStorage.getItem('movies'));
+    if (storedMovies) setMovies(storedMovies);
+  }, []);
+
+  useEffect(() => {
+    localStorage.setItem('movies', JSON.stringify(movies));
+  }, [movies])
 
   const filteredMovies = movies.filter(
     (movie) =>
@@ -31,7 +29,7 @@ const Home = () => {
   );
 
   const addMovie = () => {
-    setMovies([...movies, newMovie]);
+    setMovies([...movies, {...newMovie, id: Date.now()}]);
     setIsModalOpen(false);
     setNewMovie({ title: '', description: '', posterURL: '', rating: 0 });
   };
@@ -51,7 +49,7 @@ const Home = () => {
       <MovieList movies={filteredMovies} />
       <Modal
         title="Add a New Movie"
-        visible={isModalOpen}
+        open={isModalOpen}
         onOk={addMovie}
         onCancel={() => setIsModalOpen(false)}
       >
