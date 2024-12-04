@@ -1,62 +1,103 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 
-// Create the Context
-const TaskContext = createContext();
+const STORAGE_KEY = 'tasks';
+
+// Create the Context with a default value
+const TaskContext = createContext({
+  tasks: [],
+  editingTask: null,
+  setEditingTask: () => {},
+  addTask: () => {},
+  editTask: () => {},
+  deleteTask: () => {},
+  toggleComplete: () => {},
+  openModal: false,
+});
 
 // Provider Component
 export const TaskProvider = ({ children }) => {
-  const [tasks, setTasks] = useState([]);
+  const [tasks, setTasks] = useState(() => {
+    try {
+      const savedTasks = localStorage.getItem(STORAGE_KEY);
+      return savedTasks ? JSON.parse(savedTasks) : [];
+    } catch (error) {
+      console.error('Error loading tasks:', error);
+      return [];
+    }
+  });
+  
   const [editingTask, setEditingTask] = useState(null);
-
-  // Load tasks from localStorage on initialization
-  useEffect(() => {
-    const savedTasks = JSON.parse(localStorage.getItem('tasks')) || [];
-    setTasks(savedTasks);
-  }, []);
 
   // Persist tasks to localStorage on update
   useEffect(() => {
-    localStorage.setItem('tasks', JSON.stringify(tasks));
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(tasks));
+    } catch (error) {
+      console.error('Error saving tasks:', error);
+    }
   }, [tasks]);
 
-  const addTask = (task) => {
-    setTasks([...tasks, { ...task, id: Date.now(), completed: false }]);
-  };
+  // Memoized task operations
+  const addTask = useCallback((task) => {
+    setTasks(currentTasks => [
+      ...currentTasks,
+      {
+        ...task,
+        id: Date.now(),
+        completed: false,
+        createdAt: new Date().toISOString()
+      }
+    ]);
+  }, []);
 
-  const editTask = (updatedTask) => {
-    setTasks(tasks.map((task) => (task.id === updatedTask.id ? updatedTask : task)));
-  };
-
-  const deleteTask = (taskId) => {
-    setTasks(tasks.filter((task) => task.id !== taskId));
-  };
-
-  const toggleComplete = (taskId) => {
-    setTasks(
-      tasks.map((task) =>
-        task.id === taskId ? { ...task, completed: !task.completed } : task
+  const editTask = useCallback((updatedTask) => {
+    setTasks(currentTasks =>
+      currentTasks.map(task => 
+        task.id === updatedTask.id 
+          ? { ...updatedTask, updatedAt: new Date().toISOString() }
+          : task
       )
     );
+  }, []);
+
+  const deleteTask = useCallback((taskId) => {
+    setTasks(currentTasks => 
+      currentTasks.filter(task => task.id !== taskId)
+    );
+  }, []);
+
+  const toggleComplete = useCallback((taskId) => {
+    setTasks(currentTasks =>
+      currentTasks.map(task =>
+        task.id === taskId
+          ? { ...task, completed: !task.completed, updatedAt: new Date().toISOString() }
+          : task
+      )
+    );
+  }, []);
+
+  const contextValue = {
+    tasks,
+    editingTask,
+    setEditingTask,
+    addTask,
+    editTask,
+    deleteTask,
+    toggleComplete,
   };
 
   return (
-    <TaskContext.Provider
-      value={{
-        tasks,
-        editingTask,
-        setEditingTask,
-        addTask,
-        editTask,
-        deleteTask,
-        toggleComplete,
-      }}
-    >
+    <TaskContext.Provider value={contextValue}>
       {children}
     </TaskContext.Provider>
   );
 };
 
-// Custom Hook to use TaskContext
+// Custom Hook to use TaskContext with error handling
 export const useTaskContext = () => {
-  return useContext(TaskContext);
+  const context = useContext(TaskContext);
+  if (!context) {
+    throw new Error('useTaskContext must be used within a TaskProvider');
+  }
+  return context;
 };
