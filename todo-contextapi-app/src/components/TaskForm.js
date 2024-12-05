@@ -6,8 +6,11 @@ const TaskForm = () => {
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
 
-  const [handleOpen, setHandleOpen] = useState(false);
+  const [method, setMethod] = useState('');
   const { addTask, editTask, editingTask, setEditingTask } = useTaskContext();
+
+
+  console.log('editing out of useEffect', editingTask?.name);
 
   useEffect(() => {
     if (editingTask) {
@@ -33,9 +36,8 @@ const TaskForm = () => {
         description: values.description.trim(),
       };
 
-      if (editingTask) {
+      if (editingTask?.name !== '') {
         editTask({ ...editingTask, ...taskData });
-        
         message.success('Task updated successfully');
       } else {
         addTask(taskData);
@@ -54,17 +56,21 @@ const TaskForm = () => {
     form.resetFields();
     setEditingTask(null);
   }, [form, setEditingTask]);
-
-  console.log("setEditingTask", setEditingTask);
   
   return (
     <Modal
-      title={editingTask ? 'Edit Task' : 'Add Task'}
-    //   open={open}
+      title={
+        editingTask?.name !== '' ? 
+        'Edit Task' 
+        :
+        'Add Task'
+      }
+      open={editingTask}
+      onOk={editingTask} 
       onCancel={handleCancel}
       footer={null}
       destroyOnClose
-      maskClosable={false}
+      maskClosable={true}
       centered
     >
       <Form 
@@ -110,7 +116,7 @@ const TaskForm = () => {
             loading={loading}
             disabled={loading}
           >
-            {editingTask ? 'Save Changes' : 'Add Task'}
+            {editingTask?.name !== '' ? 'Save Changes' : 'Add Task'}
           </Button>
         </Form.Item>
       </Form>
